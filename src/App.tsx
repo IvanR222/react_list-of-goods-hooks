@@ -17,39 +17,45 @@ export const goodsFromServer = [
 ];
 
 export enum SortType {
+  none = 'none',    // Добавляем значение по умолчанию
   alphabet = 'alphabet',
   length = 'length',
 }
 
 function getSortedGoods(
   listOfGoods: string[],
-  sortType: SortType | '',
-  reverse: boolean
+  sortType: SortType,  // Убираем union с пустой строкой
+  reverse: boolean,
 ): string[] {
   const sorted = [...listOfGoods];
-  if (sortType) {
+
+  if (sortType !== SortType.none) {  // Проверяем на none вместо пустой строки
     sorted.sort((a, b) => {
       switch (sortType) {
         case SortType.alphabet:
           return a.localeCompare(b);
         case SortType.length:
           return a.length - b.length;
+        default:
+          return 0;
       }
     });
   }
+
   if (reverse) {
     sorted.reverse();
   }
+
   return sorted;
 }
 
 export const App: React.FC = () => {
-  const [sortType, setSortType] = useState<SortType | ''>('');
+  const [sortType, setSortType] = useState<SortType>(SortType.none);  // Используем SortType.none
   const [isReverse, setIsReverse] = useState(false);
 
   const visibleGoods = getSortedGoods(goodsFromServer, sortType, isReverse);
 
-  const resetVisible = sortType !== '' || isReverse;
+  const resetVisible = sortType !== SortType.none || isReverse;
 
   return (
     <div className="section content">
@@ -91,7 +97,7 @@ export const App: React.FC = () => {
             data-cy="Reset"
             className="button is-danger is-light"
             onClick={() => {
-              setSortType('');
+              setSortType(SortType.none);  // Используем SortType.none вместо пустой строки
               setIsReverse(false);
             }}
           >
